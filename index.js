@@ -11,27 +11,22 @@ dotenv.config();
 const app = express()
 const port = process.env.PORT || 5000;
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "https://mode-inc.onrender.com",
-  "https://mode-admin.onrender.com"
-];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error("Not allowed by CORS"));
-  },
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  credentials: true,
+  origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://mode-inc.onrender.com",
+      "https://mode-admin.onrender.com"
+  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  credentials: true, // ✅ Ensures cookies are sent in cross-origin requests
   allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["Authorization"]
+  exposedHeaders: ["Authorization"] // ✅ Exposes Authorization header for frontend
 }));
+
+// Handle Preflight Requests
+app.options('*', cors());
 
 // ✅ Optional: Handle preflight (OPTIONS) requests globally
 app.options("*", cors());
@@ -48,11 +43,11 @@ app.use("/api/stock", stockRoute);
 async function main() {
   await mongoose.connect(process.env.MONGODB_URL);
 
-}
+  app.get('/', (req, res) => {
+    res.send('stock running successfully!')
+  })
 
-app.get('/', (req, res) => {
-  res.send('stock running successfully!')
-})
+}
 
 main()
 .then(() => console.log("Mongodb connected successfully!"))
