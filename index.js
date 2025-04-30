@@ -38,16 +38,16 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 app.use("/api/users",userRoute);
 app.use("/api/stock", stockRoute);
 
+app.get('/', (req, res) => {
+  res.send('stock running successfully!')
+})
+
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
 async function main() {
   await mongoose.connect(process.env.MONGODB_URL);
-
-  app.get('/', (req, res) => {
-    res.send('stock running successfully!')
-  })
 
 }
 
