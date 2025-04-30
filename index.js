@@ -11,17 +11,38 @@ dotenv.config();
 const app = express()
 const port = process.env.PORT || 5000;
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://mode-inc.onrender.com",
+  "https://mode-admin.onrender.com"
+];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  credentials: true, // ✅ Ensures cookies are sent in cross-origin requests
-  allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["Authorization"] // ✅ Exposes Authorization header for frontend
+  credentials: true,
 }));
+
+// ✅ Optional: Handle preflight (OPTIONS) requests globally
+app.options("*", cors());
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 
 app.use("/api/users",userRoute);
 app.use("/api/stock", stockRoute);
