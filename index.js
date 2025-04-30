@@ -28,10 +28,6 @@ app.use(cors({
 // Handle Preflight Requests
 app.options('*', cors());
 
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
-
 
 app.use(express.json());
 app.use(cookieParser());
@@ -41,6 +37,10 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 
 app.use("/api/users",userRoute);
 app.use("/api/stock", stockRoute);
+
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
 
 async function main() {
   await mongoose.connect(process.env.MONGODB_URL);
