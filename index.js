@@ -38,9 +38,9 @@ app.options('*', cors({
 // }));
 
 // ✅ Handle Preflight Requests
-app.options('*', (req, res) => {
-  res.sendStatus(200);
-});
+// app.options('*', (req, res) => {
+//   res.sendStatus(200);
+// });
 
 
 app.use(express.json());
